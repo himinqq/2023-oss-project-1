@@ -1,6 +1,6 @@
 # 2023-oss-project-1
 
-프로그램 흐름 제어 - until loop 사용 
+### 프로그램 흐름 제어 - until loop 사용 
 stop을 변수로 두고, 9번을 선택하면 stop = Y로 할당하여 종료되도록 작성했습니다.
 
 ```bash 
@@ -21,7 +21,7 @@ do
         esac
 done
 ```
-1. Get the data of the movie identified by a specific 'movie id' from 'u.item'
+### 1. Get the data of the movie identified by a specific 'movie id' from 'u.item'
 
 ```bash 
 read -p "Please enter 'movie id'(1~1682): " id
@@ -30,7 +30,7 @@ awk -F'|' -v num=$id 'num==$1{print $0}' u.item
 사용자 입력값을 awk에서 변수로 사용하기위해 -v 옵션을 사용했습니다.  
 사용자 입력값인 id와 u.item파일의 1번째 필드의 값인 movie id가 같은 행을 출력하도록 패턴과 액션을 정의했습니다.
 
-2. Get the data of action genre movies from 'u.item'
+### 2. Get the data of action genre movies from 'u.item'
 
 ```bash 
 read -p "Do you want to get the data of action genre movies from 'u.item'?(y/n) " ans
@@ -39,7 +39,7 @@ awk -F'|' -v num=$ans 'num=="y" && $7==1{print $1,$2}' u.item | head
 사용자 입력이 y이고 u.item의 7번째 필드가 1으로 액션 장르의 영화일때 u.item의 movie id와 제목을 출력합니다.  
 head 명령어로 10줄을 출력하도록 설정했습니다.
 
-3. Get the average 'rating' of the movie identified by specific 'movie id' from 'u.item'
+### 3. Get the average 'rating' of the movie identified by specific 'movie id' from 'u.item'
 
 ```bash 
 read -p "Please enter the 'movie id'(1~1682): " id
@@ -48,25 +48,38 @@ awk -v num=$id 'num==$2{sum+=$3;count++} END{printf("average rating of %d : %.5f
 사용자 입력값인 id와 u.data파일의 2번째 필드의 값인 movie id가 동일하면 해당 영화의 평점을 sum에 더하고 count를 증가시켜 총 개수를 셉니다.  
 u.data파일의 모든 행을 수행하고 END이후 해당 영화의 모든 평점을 누적한 sum을 count로 나누어 평균을 계산하고 출력합니다.
 
-4. Delete the 'IMDb URL' from 'u.item'
+### 4. Delete the 'IMDb URL' from 'u.item'
 ```bash 
 read -p "Do you want to delete the 'IMDb URL' from 'u.item'?" ans
 awk -v num=$ans 'num=="y"{print $0}' u.item | head | sed -E 's/(http)[^\)]*\)//g'
 ```
+사용자 입력값이 y 일때만 u.item의 모든 행의 데이터를 출력하여 파이프로 넘깁니다.  
+sed -E 옵션으로 확장된 정규 표현식을 사용합니다.  
+'s/(http)[^\)]*\)//g' 는 "http"다음에 나오는 ')'문자를 포함하지 않는 모든 문자열을 찾아서 삭제합니다.
 
-5. Get the data about users from 'u.user'
+> (http)로 패턴을 그룹화하여 http로 시작하고, [^\)]* 닫는괄호가 아닌 문자가 0개이상 있으며, 닫는괄호로 끝나는 표현식 패턴을 
+//로 대치하여 패턴에 일치하는 부분을 비워서 삭제하도록 작성했습니다.
+
+### 5. Get the data about users from 'u.user'
 ```bash 
 read -p "Do you want to get the data about users from 'u.user?'(y/n)" ans
 awk -F'|' -v num=$ans 'num=="y"{printf("\nuser %d is %d years old %s %s",$1,$2,$3,$4)}' u.user | head -11
 ```
+사용자 입력이 y이면 printf를 사용하여 사용자 정보를 출력합니다. 
+u.data파일은 필드 순서대로 user id, age, gender, occupation의 데이터를 가집니다.
 
-6. Modify the format of 'release date' in 'u.item'
+### 6. Modify the format of 'release date' in 'u.item'
 ```bash 
 read -p "Do you want to Modify the format of 'release data' in 'u.item?(y/n)" ans
 awk -F'|' -v num=$ans 'num=="y"{if($1>=1673 && $1<=1682) print $0}' u.item | sed -E 's/([0-9]+)-(.*)-([0-9]+)/\3\2\1/g' | sed -E -e 's/Jan/01/g' -e 's/Feb/02/g' -e 's/Mar/03/g' -e 's/Apr/04/g' -e 's/May/05/g' -e 's/Jun/06/g' -e 's/Jul/07/g' -e 's/Aug/08/g' -e 's/Sep/09/g' -e 's/Oct/10/g' -e 's/Nov/11/g' -e 's/Dec/12/g'
 ```
+u.item파일의 3번째 필드인 release date의 형식을 수정합니다.  
+movie id의 범위가 1673~1682인 10줄만 출력해야 하기 때문에 awk의 액션 내부에 if($1>=1673 && $1<=1682)로 범위를 제한하여 출력값을 파이프로 넘깁니다.  
+'s/([0-9]+)-(.*)-([0-9]+)/\3\2\1/g'는 date-month-year의 순서를 year month date으로 변경합니다.
+> ([0-9]+) : [char1-char2]로 숫자범위를 지정하고 그룹화하여 0-9범위의 숫자가 1개이상 존재하는 패턴을 의미합니다.
+> (.*) : 모든 문자열을 의미합니다.
 
-7. Get the data of movies rated by a specific 'user.id' from 'u.data'
+### 7. Get the data of movies rated by a specific 'user.id' from 'u.data'
 ```bash 
 read -p "Please enter the 'user id' (1~943) " ans
 sort -k2,2 -sn u.data | awk -v userid=$ans '{if(userid==$1) {print $2} }' > movieid
@@ -75,7 +88,7 @@ echo -e
 awk -F'|' 'FNR==NR {movie_ids[$0]; next} $1 in movie_ids {printf ("\n%d|%s ",$1,$2)}' movieid u.item | head -11
 ```
 
-8. Get the average 'rating' of movies rated by users with 'age' between 20 and 29 and 'occupation' as 'programmer'
+### 8. Get the average 'rating' of movies rated by users with 'age' between 20 and 29 and 'occupation' as 'programmer'
 ```bash 
 read -p "Do you want to get the average 'rating' of movies rated by users with 'age' between 20 and 29 and 'occupation' as 'programmer?(y/n) " ans
 awk -F'|' -v num=$ans 'num=="y"{if( ($2>=20 && $2<=29) && $4=="programmer") {print $1}}' u.user > userid
