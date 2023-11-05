@@ -27,12 +27,17 @@ done
 read -p "Please enter 'movie id'(1~1682): " id
 awk -F'|' -v num=$id 'num==$1{print $0}' u.item
 ```
+사용자 입력값을 awk에서 변수로 사용하기위해 -v 옵션을 사용했습니다.  
+사용자 입력값인 id와 u.item파일의 1번째 필드의 값인 movie id가 같은 행을 출력하도록 패턴과 액션을 정의했습니다.
+
 2. Get the data of action genre movies from 'u.item'
 
 ```bash 
 read -p "Do you want to get the data of action genre movies from 'u.item'?(y/n) " ans
 awk -F'|' -v num=$ans 'num=="y" && $7==1{print $1,$2}' u.item | head
 ```
+사용자 입력이 y이고 u.item의 7번째 필드가 1으로 액션 장르의 영화일때 u.item의 movie id와 제목을 출력합니다.  
+head 명령어로 10줄을 출력하도록 설정했습니다.
 
 3. Get the average 'rating' of the movie identified by specific 'movie id' from 'u.item'
 
@@ -40,6 +45,8 @@ awk -F'|' -v num=$ans 'num=="y" && $7==1{print $1,$2}' u.item | head
 read -p "Please enter the 'movie id'(1~1682): " id
 awk -v num=$id 'num==$2{sum+=$3;count++} END{printf("average rating of %d : %.5f\n",num,sum/count)}' u.data
 ```
+사용자 입력값인 id와 u.data파일의 2번째 필드의 값인 movie id가 동일하면 해당 영화의 평점을 sum에 더하고 count를 증가시켜 총 개수를 셉니다.  
+u.data파일의 모든 행을 수행하고 END이후 해당 영화의 모든 평점을 누적한 sum을 count로 나누어 평균을 계산하고 출력합니다.
 
 4. Delete the 'IMDb URL' from 'u.item'
 ```bash 
